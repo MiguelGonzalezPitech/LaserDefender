@@ -7,8 +7,6 @@ public class GameSession : MonoBehaviour
     [SerializeField]
     int score = 0;
 
-    [SerializeField]
-    float playerHealth = 200; 
     // Start is called before the first frame update
     void Awake()
     {
@@ -37,15 +35,7 @@ public class GameSession : MonoBehaviour
         return score;
     }
 
-    public void AddDamage(float damage)
-    {
-        playerHealth -= damage;
-    }
 
-    public float GetPlayerHealth()
-    {
-        return playerHealth;
-    }
 
     public void ResetGame()
     {
