@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [Header("Player")]
     [SerializeField]
     float movSpeed = 10f;
 
@@ -12,13 +13,30 @@ public class Player : MonoBehaviour
     float padding = 1f;
 
     [SerializeField]
+    float health = 200;
+
+    [SerializeField]
+    AudioClip deathSFX;
+
+    [SerializeField]
+    [Range(0, 1)] float deathVolume;
+
+    [Header("Laser")]
+    [SerializeField]
     GameObject laserPrefab;
 
     [SerializeField]
     float laserSpeed = 10f;
 
     [SerializeField]
-    float timeBetweenShots = 0.50f;
+    float timeBetweenShots = 0.10f;
+
+    [SerializeField]
+    AudioClip laserSFX;
+
+    [SerializeField]
+    [Range(0, 1)] float laserVolume;
+
 
 
     Coroutine fireCoroutine;
@@ -47,11 +65,13 @@ public class Player : MonoBehaviour
         if (Input.GetButtonDown("Fire1"))
         {
             fireCoroutine = StartCoroutine(FireCoroutine());
+
         }
         if (Input.GetButtonUp("Fire1"))
         {
             StopCoroutine(fireCoroutine);
         }
+
     }
 
     IEnumerator FireCoroutine()
@@ -64,6 +84,8 @@ public class Player : MonoBehaviour
                 Quaternion.identity
                 ) as GameObject;
             laser.GetComponent<Rigidbody2D>().velocity = new Vector2(0, laserSpeed);
+            AudioSource.PlayClipAtPoint(laserSFX, Camera.main.gameObject.transform.position, laserVolume);
+
             yield return new WaitForSeconds(timeBetweenShots);
         }
     }
@@ -85,5 +107,28 @@ public class Player : MonoBehaviour
         xMax = cam.ViewportToWorldPoint(new Vector3(1, 0, 0)).x - padding;
         yMin = cam.ViewportToWorldPoint(new Vector3(0, 0, 0)).y + padding;
         yMax = cam.ViewportToWorldPoint(new Vector3(0, 1, 0)).y - padding;
+    }
+
+    public float GetPlayerHealth()
+    {
+        return health;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider2d)
+    {
+        DamageDealer damageDealer = collider2d.gameObject.GetComponent<DamageDealer>();
+        health -= damageDealer.GetDamage();
+        damageDealer.Hit();
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Destroy(gameObject);
+        AudioSource.PlayClipAtPoint(deathSFX, Camera.main.transform.position, deathVolume);
+        FindObjectOfType<Level>().LoadGameOver();
     }
 }

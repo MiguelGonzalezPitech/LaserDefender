@@ -15,8 +15,8 @@ public class Shredder : MonoBehaviour
     {
         
     }
-    void OnCollisionEnter2D(Collision2D collider)
-	{
-		Destroy(collider.gameObject);
+    void OnTriggerEnter2D(Collider2D collider2d)
+    {
+		Destroy(collider2d.gameObject);
 	}
 }
